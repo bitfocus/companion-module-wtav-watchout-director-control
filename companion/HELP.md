@@ -50,8 +50,9 @@ Per timeline: name, state, current time (m:ss and ms), progress %, **countdown t
 (m:ss and ms), the **countdown marker name** it is counting toward, the **next cue name**, and time to
 the next cue. Per keyed variable: value, %, and value **source**. Plus `show_name` and `connection`.
 
-A **Timelines — Readouts** preset gives you a ready-made button showing the current time, the countdown,
-and the marker name on three lines, turning red under 10 s.
+The **Timelines — Readouts** section gives three ready-made buttons per timeline so you pick what to
+show: **current time**, **countdown** (with the marker name it counts toward), or **both**. The
+countdown ones turn red under 10 s and read `--:--` when no countdown marker is ahead.
 
 ## About variable feedback — an honest note
 
