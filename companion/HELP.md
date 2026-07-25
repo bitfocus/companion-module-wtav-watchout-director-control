@@ -17,10 +17,23 @@ variables by name/id, independent of how the app's canvas is laid out.
 
 - **Timeline: play / pause / stop / toggle** — transport for one timeline.
 - **Timeline: play from position (ms)** — play starting at an exact millisecond.
-- **Timeline: jump to time or cue** — seek to a time or a cue id, then play or hold (pause).
+- **Timeline: jump to time or cue** — in **cue** mode you pick a cue straight from a dropdown of the
+  show's cues (each already carries its own timeline, so no id typing); in **time** mode you pick a
+  timeline + a millisecond. Then play or hold (pause).
 - **Cue set: activate preset** — switch a WATCHOUT cue set to one of its presets.
 - **Variable: set value** — set an input **by its key** (the external-control key you assign in
   WATCHOUT Producer; an empty key would hit every variable, so only keyed variables are listed).
+- **Surface: press a button / widget** — press a specific widget on the app's own canvas, listed
+  grouped per page (the semantic mirror of the phone remote). Only single-press widget types are
+  offered (buttons, multi-actions, schedules, Wake-on-LAN, Companion, device).
+
+## Presets
+
+Ready-made buttons are generated from the discovered show, grouped into sections: **Timelines —
+Play/Pause** (green when playing, amber when paused), **— Stop** (red when stopped), **— Progress bars**
+(live fill, press toggles), **Cue sets** (highlight on the active preset), **Variables** (a live value
+bar plus set-to-min/max examples), **Surface buttons** (one per pressable widget, per page), and
+**Status**. Drag one onto a button and it arrives fully wired with its feedback.
 
 ## Feedbacks
 
