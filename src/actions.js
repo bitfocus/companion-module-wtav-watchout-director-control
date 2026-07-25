@@ -2,12 +2,14 @@
 // self.apiPost(...). Dropdowns are filled from self.show (the discovered timelines
 // / cue sets / variables) and refresh whenever the show changes. allowCustom lets
 // you type an id before a show has been discovered.
-import { timelineChoices, variableChoices, cuesetPresetChoices, unpackPair } from './util.js'
+import { timelineChoices, variableChoices, cuesetPresetChoices, cueChoices, surfaceWidgetChoices, unpackPair } from './util.js'
 
 export default function (self) {
 	const tls = timelineChoices(self.show)
 	const vars = variableChoices(self.show)
 	const presets = cuesetPresetChoices(self.show)
+	const cues = cueChoices(self.show)
+	const widgets = surfaceWidgetChoices(self.show)
 
 	const timelineField = (id = 'timeline', label = 'Timeline') => ({
 		type: 'dropdown',
@@ -55,19 +57,28 @@ export default function (self) {
 		timeline_jump: {
 			name: 'Timeline: jump to time or cue',
 			options: [
-				timelineField(),
 				{
 					type: 'dropdown',
 					id: 'mode',
 					label: 'Jump to',
-					default: 'time',
+					default: 'cue',
 					choices: [
-						{ id: 'time', label: 'Time (ms)' },
-						{ id: 'cue', label: 'Cue id' },
+						{ id: 'cue', label: 'A cue (pick from the show)' },
+						{ id: 'time', label: 'A time (ms)' },
 					],
 				},
+				// Cue mode: one picker that already carries its own timeline — no id typing.
+				{
+					type: 'dropdown',
+					id: 'cue',
+					label: 'Cue',
+					default: (cues[0] && cues[0].id) || '',
+					choices: cues.length ? cues : [{ id: '', label: '(no cues discovered yet)' }],
+					isVisible: (o) => o.mode === 'cue',
+				},
+				// Time mode: pick the timeline + the millisecond.
+				{ ...timelineField(), isVisible: (o) => o.mode === 'time' },
 				{ type: 'number', id: 'time', label: 'Time (ms)', default: 0, min: 0, max: 86400000, isVisible: (o) => o.mode === 'time' },
-				{ type: 'textinput', id: 'cue', label: 'Cue id', default: '', isVisible: (o) => o.mode === 'cue' },
 				{
 					type: 'dropdown',
 					id: 'state',
@@ -80,11 +91,43 @@ export default function (self) {
 				},
 			],
 			callback: async (e) => {
-				const id = String(e.options.timeline)
 				const body = { state: e.options.state }
-				if (e.options.mode === 'cue') body.cue = String(e.options.cue)
-				else body.time = Number(e.options.time)
+				let id
+				if (e.options.mode === 'cue') {
+					const pair = unpackPair(e.options.cue) // [timelineId, cueId]
+					if (!pair) {
+						self.log('warn', 'jump: pick a cue')
+						return
+					}
+					id = pair.groupId
+					body.cue = pair.presetId
+				} else {
+					id = String(e.options.timeline)
+					body.time = Number(e.options.time)
+				}
 				await self.apiPost('/timeline/' + encodeURIComponent(id) + '/jump', body)
+			},
+		},
+
+		press_widget: {
+			name: 'Surface: press a button / widget',
+			options: [
+				{
+					type: 'dropdown',
+					id: 'widget',
+					label: 'Widget (grouped per page)',
+					default: (widgets[0] && widgets[0].id) || '',
+					choices: widgets.length ? widgets : [{ id: '', label: '(no pressable widgets discovered yet)' }],
+					allowCustom: true,
+				},
+			],
+			callback: async (e) => {
+				const id = String(e.options.widget)
+				if (!id) {
+					self.log('warn', 'press: pick a widget')
+					return
+				}
+				await self.apiPost('/press/' + encodeURIComponent(id))
 			},
 		},
 

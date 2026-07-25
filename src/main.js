@@ -3,6 +3,7 @@ import upgradeScripts from './upgrades.js'
 import setupActions from './actions.js'
 import setupFeedbacks from './feedbacks.js'
 import setupVariables, { computeValues } from './variables.js'
+import setupPresets from './presets.js'
 import { apiUrl, getJson, postJson } from './api.js'
 
 // base 2.x loads the entrypoint's DEFAULT export (the InstanceBase subclass) and a
@@ -14,16 +15,17 @@ export const UpgradeScripts = upgradeScripts
 function showSignature(s) {
 	if (!s) return ''
 	return JSON.stringify([
-		(s.timelines || []).map((t) => t.id + ':' + t.name + ':' + t.folder),
+		(s.timelines || []).map((t) => t.id + ':' + t.name + ':' + t.folder + ':' + (t.cues || []).map((c) => c.id).join('.')),
 		(s.cueSets || []).map((g) => g.id + ':' + (g.presets || []).map((p) => p.id + '=' + p.name).join(',')),
 		(s.variables || []).map((v) => v.key + ':' + v.name),
+		((s.surface && s.surface.pages) || []).map((p) => p.name + ':' + (p.widgets || []).map((w) => w.id).join('.')),
 	])
 }
 
 export default class DirectorControlInstance extends InstanceBase {
 	constructor(internal) {
 		super(internal)
-		this.show = { timelines: [], cueSets: [], variables: [], showName: '' }
+		this.show = { timelines: [], cueSets: [], variables: [], surface: { pages: [] }, showName: '' }
 		this.live = { timelines: [], variables: [], cueSets: [], _connected: false }
 		this._showSig = ''
 	}
@@ -76,6 +78,7 @@ export default class DirectorControlInstance extends InstanceBase {
 		setupActions(this)
 		setupFeedbacks(this)
 		setupVariables(this)
+		setupPresets(this)
 	}
 
 	// --- polling -------------------------------------------------------------
@@ -99,6 +102,7 @@ export default class DirectorControlInstance extends InstanceBase {
 			timelines: s.timelines || [],
 			cueSets: s.cueSets || [],
 			variables: s.variables || [],
+			surface: s.surface || { pages: [] },
 			showName: s.showName || '',
 		}
 		const sig = showSignature(s)

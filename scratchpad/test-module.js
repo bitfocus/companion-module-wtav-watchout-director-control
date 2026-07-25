@@ -21,14 +21,17 @@ const eq = (a, b, m) => ok(JSON.stringify(a) === JSON.stringify(b), m + '  (got 
 console.log('util')
 const show = {
 	timelines: [
-		{ id: '0', name: 'Main', folder: null },
-		{ id: '1', name: 'Intro', folder: 'Openers/Sub' },
+		{ id: '0', name: 'Main', folder: null, cues: [{ id: 'c1', name: 'Marker A', timeMs: 5000, kind: 'marker' }] },
+		{ id: '1', name: 'Intro', folder: 'Openers/Sub', cues: [] },
 	],
 	cueSets: [{ id: 'g1', name: 'Set01', presets: [{ id: 'a', name: 'Apple' }, { id: 'd', name: 'Deliver' }] }],
 	variables: [
 		{ key: '', name: 'masterVolume', min: 0, max: 100 },
 		{ key: 'v1', name: 'Variable1', min: 0, max: 1 },
 	],
+	surface: {
+		pages: [{ name: 'Page 1', widgets: [{ id: 'id7', type: 'button', label: 'GO' }, { id: 'id9', type: 'multi', label: '' }] }],
+	},
 }
 eq(util.timelineChoices(show).length, 2, 'timeline choices count')
 ok(util.timelineChoices(show)[1].label.indexOf('Openers/Sub') === 0, 'folder prefixed in label')
@@ -37,6 +40,18 @@ eq(util.cuesetPresetChoices(show).length, 2, 'cueset preset choices count')
 const pair = util.cuesetPresetChoices(show)[0].id
 eq(util.unpackPair(pair), { groupId: 'g1', presetId: 'a' }, 'pack/unpack pair round-trip')
 ok(util.unpackPair('garbage') === null, 'unpackPair rejects garbage')
+
+// cue choices: all cues across timelines, packed with their timeline id
+const cc = util.cueChoices(show)
+eq(cc.length, 1, 'cue choices count (only timelines with cues)')
+eq(util.unpackPair(cc[0].id), { groupId: '0', presetId: 'c1' }, 'cue choice packs timeline+cue')
+ok(cc[0].label.indexOf('Main → Marker A') === 0, 'cue label has timeline + cue name')
+
+// surface widget choices: per page, labelled
+const sw = util.surfaceWidgetChoices(show)
+eq(sw.map((c) => c.id), ['id7', 'id9'], 'surface widget choices ids')
+ok(sw[0].label.indexOf('Page 1: GO (button)') === 0, 'surface widget label has page + label + type')
+ok(sw[1].label.indexOf('Page 1: id9 (multi)') === 0, 'surface widget label falls back to id')
 eq(util.sanitizeId('a b/c.d'), 'a_b_c_d', 'sanitizeId')
 eq(util.sanitizeId('v1'), 'v1', 'sanitizeId keeps clean')
 

@@ -47,6 +47,32 @@ export function cuesetPresetChoices(show) {
 	return out
 }
 
+// All navigable cues across every timeline, each packed with its timeline id so a
+// jump-to-cue picker needs no separate timeline selection.
+export function cueChoices(show) {
+	const tls = (show && show.timelines) || []
+	const out = []
+	for (const t of tls)
+		for (const c of t.cues || []) {
+			const nm = c.name || c.id
+			const at = c.timeMs != null ? ' @ ' + fmtTime(c.timeMs) : ''
+			const kind = c.kind && c.kind !== 'cue' ? ' (' + c.kind + ')' : ''
+			out.push({ id: packPair(t.id, c.id), label: (t.name || 'Timeline ' + t.id) + ' → ' + nm + at + kind })
+		}
+	return out
+}
+
+// Pressable widgets on the app's canvas, per page, for a "press surface widget" action.
+export function surfaceWidgetChoices(show) {
+	const pages = (show && show.surface && show.surface.pages) || []
+	const out = []
+	for (const p of pages)
+		for (const w of p.widgets || []) {
+			out.push({ id: String(w.id), label: (p.name || 'Page') + ': ' + (w.label || w.id) + ' (' + w.type + ')' })
+		}
+	return out
+}
+
 export function fmtNum(n) {
 	const v = Number(n)
 	if (!isFinite(v)) return '?'
