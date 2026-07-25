@@ -31,11 +31,13 @@ export default function (self) {
 	// --- Timelines: play/pause toggle (state colour) -------------------------
 	const toggleIds = []
 	for (const t of timelines) {
-		const pid = 'tl_' + sanitizeId(t.id) + '_toggle'
+		const sid = sanitizeId(t.id)
+		const pid = 'tl_' + sid + '_toggle'
 		presets[pid] = {
 			type: 'simple',
 			name: tlName(t) + ': Play/Pause',
-			style: { text: tlName(t), size: '14', color: WHITE, bgcolor: DARK },
+			// name + a small live current time underneath
+			style: { text: tlName(t) + '\n' + v('tl_' + sid + '_time'), size: '14', color: WHITE, bgcolor: DARK },
 			steps: [{ down: [{ actionId: 'timeline_transport', options: { timeline: String(t.id), verb: 'toggle' } }], up: [] }],
 			feedbacks: [
 				{ feedbackId: 'timeline_state', options: { timeline: String(t.id), state: 'playing' }, style: { bgcolor: GREEN, color: WHITE } },
@@ -76,17 +78,20 @@ export default function (self) {
 	}
 	if (progIds.length) section('tl_progress', 'Timelines — Progress bars', 'Live position bar; press toggles play/pause.', progIds)
 
-	// --- Timelines: readout (current time + countdown to marker + marker name) ---
-	// Three variants so you can pick what a button shows: time, countdown, or both.
+	// --- Timelines: readouts — three separate sections so you pick the layout ---
+	// Every variant leads with the timeline NAME so a placed button always says which
+	// timeline it is. 'auto' text size keeps the multi-line ones readable.
 	const cdWarn = (t) => [{ feedbackId: 'countdown_warning', options: { timeline: String(t.id), seconds: 10 }, style: { bgcolor: RED, color: WHITE } }]
-	const readIds = []
+	const timeIds = [],
+		cdIds = [],
+		bothIds = []
 	for (const t of timelines) {
 		const sid = sanitizeId(t.id)
 		const nm = tlName(t)
 		const pTime = 'tl_' + sid + '_readout_time'
 		presets[pTime] = {
 			type: 'simple',
-			name: nm + ': Readout — current time',
+			name: nm + ': Current time',
 			style: { text: nm + '\n' + v('tl_' + sid + '_time'), size: '18', color: WHITE, bgcolor: BLACK, show_topbar: false },
 			steps: [{ down: [], up: [] }],
 			feedbacks: [],
@@ -94,20 +99,10 @@ export default function (self) {
 		const pCd = 'tl_' + sid + '_readout_countdown'
 		presets[pCd] = {
 			type: 'simple',
-			name: nm + ': Readout — countdown',
-			// ▼ countdown, then the marker name it counts toward
-			style: { text: '▼ ' + v('tl_' + sid + '_countdown') + '\n' + v('tl_' + sid + '_countdown_name'), size: '18', color: WHITE, bgcolor: BLACK, show_topbar: false },
-			steps: [{ down: [], up: [] }],
-			feedbacks: cdWarn(t),
-		}
-		const pBoth = 'tl_' + sid + '_readout_both'
-		presets[pBoth] = {
-			type: 'simple',
-			name: nm + ': Readout — time + countdown',
-			// line 1 current time · line 2 countdown · line 3 the marker it counts toward
-			// 'auto' size so all three lines stay visible on a standard button.
+			name: nm + ': Countdown',
+			// name · ▼ countdown · the marker name it counts toward
 			style: {
-				text: v('tl_' + sid + '_time') + '\n▼ ' + v('tl_' + sid + '_countdown') + '\n' + v('tl_' + sid + '_countdown_name'),
+				text: nm + '\n▼ ' + v('tl_' + sid + '_countdown') + '\n' + v('tl_' + sid + '_countdown_name'),
 				size: 'auto',
 				color: WHITE,
 				bgcolor: BLACK,
@@ -116,15 +111,28 @@ export default function (self) {
 			steps: [{ down: [], up: [] }],
 			feedbacks: cdWarn(t),
 		}
-		readIds.push(pTime, pCd, pBoth)
+		const pBoth = 'tl_' + sid + '_readout_both'
+		presets[pBoth] = {
+			type: 'simple',
+			name: nm + ': Current time + countdown',
+			// name · current time · ▼ countdown · marker name
+			style: {
+				text: nm + '\n' + v('tl_' + sid + '_time') + '\n▼ ' + v('tl_' + sid + '_countdown') + '\n' + v('tl_' + sid + '_countdown_name'),
+				size: 'auto',
+				color: WHITE,
+				bgcolor: BLACK,
+				show_topbar: false,
+			},
+			steps: [{ down: [], up: [] }],
+			feedbacks: cdWarn(t),
+		}
+		timeIds.push(pTime)
+		cdIds.push(pCd)
+		bothIds.push(pBoth)
 	}
-	if (readIds.length)
-		section(
-			'tl_readout',
-			'Timelines — Readouts',
-			'Pick what a button shows: current time, countdown (with the marker name it counts toward), or both. Countdown turns red under 10 s and reads --:-- when no countdown marker is ahead.',
-			readIds,
-		)
+	if (timeIds.length) section('tl_read_time', 'Timelines — Current time', 'Timeline name + live current time.', timeIds)
+	if (cdIds.length) section('tl_read_cd', 'Timelines — Countdown', 'Countdown to the next marker (with its name); red under 10 s, --:-- when no marker is ahead.', cdIds)
+	if (bothIds.length) section('tl_read_both', 'Timelines — Current time + Countdown', 'Current time and countdown on one button.', bothIds)
 
 	// --- Cue sets: activate preset (active highlight) ------------------------
 	const cueIds = []

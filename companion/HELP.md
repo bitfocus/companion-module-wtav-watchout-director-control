@@ -50,9 +50,11 @@ Per timeline: name, state, current time (m:ss and ms), progress %, **countdown t
 (m:ss and ms), the **countdown marker name** it is counting toward, the **next cue name**, and time to
 the next cue. Per keyed variable: value, %, and value **source**. Plus `show_name` and `connection`.
 
-The **Timelines — Readouts** section gives three ready-made buttons per timeline so you pick what to
-show: **current time**, **countdown** (with the marker name it counts toward), or **both**. The
-countdown ones turn red under 10 s and read `--:--` when no countdown marker is ahead.
+Readout presets come in three sections so you pick the layout: **Timelines — Current time**,
+**— Countdown** (with the marker name it counts toward), and **— Current time + Countdown**. Every
+readout button (and the Play/Pause preset) leads with the **timeline name**, so a placed button always
+says which timeline it is. The countdown buttons turn red under 10 s and read `--:--` when no marker is
+ahead.
 
 ## About variable feedback — an honest note
 
