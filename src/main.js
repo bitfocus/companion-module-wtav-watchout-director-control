@@ -139,6 +139,6 @@ export default class DirectorControlInstance extends InstanceBase {
 		}
 		if (!this.show.showName && st.showName) this.show.showName = st.showName
 		this.setVariableValues(computeValues(this))
-		this.checkFeedbacks('timeline_state', 'cueset_active', 'timeline_progress', 'variable_bar')
+		this.checkFeedbacks('timeline_state', 'countdown_warning', 'cueset_active', 'timeline_progress', 'variable_bar')
 	}
 }

@@ -38,14 +38,20 @@ bar plus set-to-min/max examples), **Surface buttons** (one per pressable widget
 ## Feedbacks
 
 - **Timeline: play state (colour)** — restyle a button when a timeline is playing / paused / stopped.
+- **Timeline: countdown warning (colour)** — turn a button red when the countdown to the next marker
+  drops under a chosen number of seconds (default 10).
 - **Cue set: preset is active (colour)** — light up the active preset.
 - **Timeline: progress bar (0-100%)** — a live fill bar of the timeline's position.
 - **Variable: value bar (0-100%)** — a live fill bar of a variable's value across its range.
 
 ## Variables
 
-Per timeline (`$(wtav-directorcontrol:tl_<id>_state)` etc.): name, state, time (m:ss), time (ms),
-progress %. Per keyed variable: value, %, and value **source**. Plus `show_name` and `connection`.
+Per timeline: name, state, current time (m:ss and ms), progress %, **countdown to the next marker**
+(m:ss and ms), the **countdown marker name** it is counting toward, the **next cue name**, and time to
+the next cue. Per keyed variable: value, %, and value **source**. Plus `show_name` and `connection`.
+
+A **Timelines — Readouts** preset gives you a ready-made button showing the current time, the countdown,
+and the marker name on three lines, turning red under 10 s.
 
 ## About variable feedback — an honest note
 

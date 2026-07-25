@@ -21,6 +21,8 @@ export default function (self) {
 	const variables = (show.variables || []).filter((v) => v.key)
 	const pages = (show.surface && show.surface.pages) || []
 	const tlName = (t) => t.name || 'Timeline ' + t.id
+	const lbl = self.label || 'internal' // for referencing our own variables in button text
+	const v = (id) => '$(' + lbl + ':' + id + ')'
 
 	const presets = {}
 	const sections = []
@@ -73,6 +75,31 @@ export default function (self) {
 		progIds.push(pid)
 	}
 	if (progIds.length) section('tl_progress', 'Timelines — Progress bars', 'Live position bar; press toggles play/pause.', progIds)
+
+	// --- Timelines: readout (current time + countdown to marker + marker name) ---
+	const readIds = []
+	for (const t of timelines) {
+		const sid = sanitizeId(t.id)
+		const pid = 'tl_' + sid + '_readout'
+		presets[pid] = {
+			type: 'simple',
+			name: tlName(t) + ': Readout (time + countdown)',
+			style: {
+				// line 1 current time · line 2 countdown · line 3 the marker it counts toward
+				text: v('tl_' + sid + '_time') + '\n▼ ' + v('tl_' + sid + '_countdown') + '\n' + v('tl_' + sid + '_countdown_name'),
+				size: '14',
+				color: WHITE,
+				bgcolor: BLACK,
+				show_topbar: false,
+			},
+			steps: [{ down: [], up: [] }],
+			feedbacks: [
+				{ feedbackId: 'countdown_warning', options: { timeline: String(t.id), seconds: 10 }, style: { bgcolor: RED, color: WHITE } },
+			],
+		}
+		readIds.push(pid)
+	}
+	if (readIds.length) section('tl_readout', 'Timelines — Readouts', 'Current time, countdown, and the marker name it counts toward; red under 10 s.', readIds)
 
 	// --- Cue sets: activate preset (active highlight) ------------------------
 	const cueIds = []
@@ -140,11 +167,10 @@ export default function (self) {
 	if (pressIds.length) section('surface', 'Surface buttons', 'Press a button/widget on the app’s own canvas, per page.', pressIds)
 
 	// --- Status --------------------------------------------------------------
-	const lbl = self.label || 'internal'
 	presets['status'] = {
 		type: 'simple',
 		name: 'Connection status',
-		style: { text: 'Director\n$(' + lbl + ':connection)', size: '14', color: WHITE, bgcolor: DARK },
+		style: { text: 'Director\n' + v('connection'), size: '14', color: WHITE, bgcolor: DARK },
 		steps: [{ down: [], up: [] }],
 		feedbacks: [],
 	}

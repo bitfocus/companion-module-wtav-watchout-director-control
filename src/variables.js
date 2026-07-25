@@ -11,6 +11,11 @@ function tlIds(sid) {
 		time: 'tl_' + sid + '_time',
 		timeMs: 'tl_' + sid + '_time_ms',
 		pct: 'tl_' + sid + '_pct',
+		countdown: 'tl_' + sid + '_countdown',
+		countdownMs: 'tl_' + sid + '_countdown_ms',
+		countdownName: 'tl_' + sid + '_countdown_name',
+		nextCue: 'tl_' + sid + '_next_cue',
+		toNext: 'tl_' + sid + '_to_next',
 	}
 }
 function varIds(skey) {
@@ -28,9 +33,14 @@ export default function (self) {
 		const nm = t.name || 'Timeline ' + t.id
 		defs[id.name] = { name: 'Timeline ' + t.id + ' — name' }
 		defs[id.state] = { name: nm + ' — state' }
-		defs[id.time] = { name: nm + ' — time (m:ss)' }
-		defs[id.timeMs] = { name: nm + ' — time (ms)' }
+		defs[id.time] = { name: nm + ' — current time (m:ss)' }
+		defs[id.timeMs] = { name: nm + ' — current time (ms)' }
 		defs[id.pct] = { name: nm + ' — progress %' }
+		defs[id.countdown] = { name: nm + ' — countdown to marker (m:ss)' }
+		defs[id.countdownMs] = { name: nm + ' — countdown to marker (ms)' }
+		defs[id.countdownName] = { name: nm + ' — countdown marker name' }
+		defs[id.nextCue] = { name: nm + ' — next cue name' }
+		defs[id.toNext] = { name: nm + ' — time to next cue (m:ss)' }
 	}
 	for (const v of self.show.variables || []) {
 		if (!v.key) continue
@@ -60,6 +70,11 @@ export function computeValues(self) {
 		out[id.time] = fmtTime(lt.timeMs != null ? lt.timeMs : 0)
 		out[id.timeMs] = Math.round(lt.timeMs || 0)
 		out[id.pct] = lt.pct != null ? Math.round(lt.pct * 100) : 0
+		out[id.countdown] = lt.countdownMs != null ? fmtTime(lt.countdownMs) : '--:--'
+		out[id.countdownMs] = lt.countdownMs != null ? Math.round(lt.countdownMs) : ''
+		out[id.countdownName] = lt.countdownName || '—'
+		out[id.nextCue] = lt.nextCueName || '—'
+		out[id.toNext] = lt.timeToNextMs != null ? fmtTime(lt.timeToNextMs) : '--:--'
 	}
 	const liveVar = {}
 	for (const v of self.live.variables || []) liveVar[String(v.key)] = v

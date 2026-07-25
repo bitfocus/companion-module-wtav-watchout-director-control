@@ -51,6 +51,21 @@ export default function (self) {
 			},
 		},
 
+		countdown_warning: {
+			name: 'Timeline: countdown warning (colour)',
+			type: 'boolean',
+			defaultStyle: { bgcolor: 0xcc0000, color: 0xffffff },
+			options: [
+				tlField,
+				{ type: 'number', id: 'seconds', label: 'Turn on when countdown is under (seconds)', default: 10, min: 1, max: 3600 },
+			],
+			callback: (fb) => {
+				const t = liveTimeline(self, fb.options.timeline)
+				if (!t || t.countdownMs == null) return false
+				return t.countdownMs < Number(fb.options.seconds) * 1000
+			},
+		},
+
 		cueset_active: {
 			name: 'Cue set: preset is active (colour)',
 			type: 'boolean',
