@@ -7,8 +7,8 @@
 	"description": "WTAV Watchout Director Control — drive a WTAV Director Control app (Dataton WATCHOUT 7 surface): timelines, cue sets and variables, with live feedback and 0-100% bars.",
 	"version": "0.1.0",
 	"license": "MIT",
-	"repository": "git+https://github.com/wvanmaris/companion-module-directorcontrol.git",
-	"bugs": "https://github.com/wvanmaris/companion-module-directorcontrol/issues",
+	"repository": "git+https://github.com/wvanmaris/companion-module-watchoutdirectorcontrol.git",
+	"bugs": "https://github.com/wvanmaris/companion-module-watchoutdirectorcontrol/issues",
 	"maintainers": [
 		{
 			"name": "WTAV",

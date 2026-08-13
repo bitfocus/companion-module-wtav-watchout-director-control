@@ -1,5 +1,5 @@
 {
-	"name": "companion-module-directorcontrol",
+	"name": "companion-module-watchoutdirectorcontrol",
 	"version": "0.1.0",
 	"type": "module",
 	"main": "src/main.js",
@@ -11,7 +11,7 @@
 	"license": "MIT",
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/wvanmaris/companion-module-directorcontrol.git"
+		"url": "git+https://github.com/wvanmaris/companion-module-watchoutdirectorcontrol.git"
 	},
 	"engines": {
 		"node": "^22.20"
