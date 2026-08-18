@@ -4,6 +4,9 @@ Control a running **WTAV Director Control** app (a control surface for Dataton *
 Companion. This module talks to the app's semantic **`/api/v1`** surface — timelines, cue sets and
 variables by name/id, independent of how the app's canvas is laid out.
 
+The **WTAV Director Control** application itself (Windows + macOS) is available at
+<https://www.avtrade.nl/wtav-director-control.html>.
+
 ## Setup
 
 1. In the **WTAV Director Control** app: open **Settings** and **start the web control surface**
