@@ -21,7 +21,7 @@ export async function getJson(url, timeoutMs) {
 		const res = await fetch(url, { method: 'GET', signal: to.signal })
 		if (!res.ok) return null
 		return await res.json()
-	} catch (e) {
+	} catch {
 		return null
 	} finally {
 		to.done()
@@ -42,7 +42,9 @@ export async function postJson(url, body, timeoutMs) {
 		let json = null
 		try {
 			json = await res.json()
-		} catch (e) {}
+		} catch {
+			// response body may be empty or not JSON — leave json as null
+		}
 		return { status: res.status, ok: res.status >= 200 && res.status < 300, json }
 	} catch (e) {
 		return { status: 0, ok: false, error: e.message }

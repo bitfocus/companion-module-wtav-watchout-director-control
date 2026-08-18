@@ -22,7 +22,7 @@ npm test             # runs scratchpad/test-module.js (no Companion needed)
 ### Running it in Companion (sideload)
 
 You do **not** need to publish this to Bitfocus to use it. In Companion, open the settings and set the
-**Developer modules path** to the folder that *contains* this module folder, then add a **WTAV Director
+**Developer modules path** to the folder that _contains_ this module folder, then add a **WTAV Director
 Control** connection. Companion hot-reloads the module when you edit a file.
 
 ### Publishing (optional, later)

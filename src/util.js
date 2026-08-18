@@ -16,7 +16,9 @@ export function unpackPair(id) {
 	try {
 		const a = JSON.parse(id)
 		if (Array.isArray(a) && a.length === 2) return { groupId: String(a[0]), presetId: String(a[1]) }
-	} catch (e) {}
+	} catch {
+		// not valid JSON / not a pair — fall through
+	}
 	return null
 }
 

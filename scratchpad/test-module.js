@@ -24,18 +24,39 @@ const show = {
 		{ id: '0', name: 'Main', folder: null, cues: [{ id: 'c1', name: 'Marker A', timeMs: 5000, kind: 'marker' }] },
 		{ id: '1', name: 'Intro', folder: 'Openers/Sub', cues: [] },
 	],
-	cueSets: [{ id: 'g1', name: 'Set01', presets: [{ id: 'a', name: 'Apple' }, { id: 'd', name: 'Deliver' }] }],
+	cueSets: [
+		{
+			id: 'g1',
+			name: 'Set01',
+			presets: [
+				{ id: 'a', name: 'Apple' },
+				{ id: 'd', name: 'Deliver' },
+			],
+		},
+	],
 	variables: [
 		{ key: '', name: 'masterVolume', min: 0, max: 100 },
 		{ key: 'v1', name: 'Variable1', min: 0, max: 1 },
 	],
 	surface: {
-		pages: [{ name: 'Page 1', widgets: [{ id: 'id7', type: 'button', label: 'GO' }, { id: 'id9', type: 'multi', label: '' }] }],
+		pages: [
+			{
+				name: 'Page 1',
+				widgets: [
+					{ id: 'id7', type: 'button', label: 'GO' },
+					{ id: 'id9', type: 'multi', label: '' },
+				],
+			},
+		],
 	},
 }
 eq(util.timelineChoices(show).length, 2, 'timeline choices count')
 ok(util.timelineChoices(show)[1].label.indexOf('Openers/Sub') === 0, 'folder prefixed in label')
-eq(util.variableChoices(show).map((c) => c.id), ['v1'], 'variable choices drop key-less')
+eq(
+	util.variableChoices(show).map((c) => c.id),
+	['v1'],
+	'variable choices drop key-less',
+)
 eq(util.cuesetPresetChoices(show).length, 2, 'cueset preset choices count')
 const pair = util.cuesetPresetChoices(show)[0].id
 eq(util.unpackPair(pair), { groupId: 'g1', presetId: 'a' }, 'pack/unpack pair round-trip')
@@ -49,7 +70,11 @@ ok(cc[0].label.indexOf('Main → Marker A') === 0, 'cue label has timeline + cue
 
 // surface widget choices: per page, labelled
 const sw = util.surfaceWidgetChoices(show)
-eq(sw.map((c) => c.id), ['id7', 'id9'], 'surface widget choices ids')
+eq(
+	sw.map((c) => c.id),
+	['id7', 'id9'],
+	'surface widget choices ids',
+)
 ok(sw[0].label.indexOf('Page 1: GO (button)') === 0, 'surface widget label has page + label + type')
 ok(sw[1].label.indexOf('Page 1: id9 (multi)') === 0, 'surface widget label falls back to id')
 eq(util.sanitizeId('a b/c.d'), 'a_b_c_d', 'sanitizeId')
@@ -68,7 +93,11 @@ ok(util.fraction(5, 10, 10) === null, 'fraction degenerate range -> null')
 console.log('api url')
 eq(apiUrl({ host: '10.0.0.5', port: '3333' }, '/show'), 'http://10.0.0.5:3333/api/v1/show', 'apiUrl full')
 eq(apiUrl({}, 'ping'), 'http://127.0.0.1:3333/api/v1/ping', 'apiUrl defaults + adds slash')
-eq(apiUrl({ host: 'dir', port: 8080 }, '/timeline/0/play'), 'http://dir:8080/api/v1/timeline/0/play', 'apiUrl numeric port')
+eq(
+	apiUrl({ host: 'dir', port: 8080 }, '/timeline/0/play'),
+	'http://dir:8080/api/v1/timeline/0/play',
+	'apiUrl numeric port',
+)
 
 // --- bar png ---------------------------------------------------------------
 console.log('bar png')
@@ -88,4 +117,4 @@ const png = encodePng(10, 4, Buffer.alloc(10 * 4 * 4, 0xff))
 ok(png.readUInt32BE(16) === 10 && png.readUInt32BE(20) === 4, 'encodePng writes width/height in IHDR')
 
 console.log('\n' + pass + ' passed, ' + fail + ' failed')
-process.exit(fail ? 1 : 0)
+process.exitCode = fail ? 1 : 0

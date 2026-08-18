@@ -57,7 +57,14 @@ export default function (self) {
 			defaultStyle: { bgcolor: 0xcc0000, color: 0xffffff },
 			options: [
 				tlField,
-				{ type: 'number', id: 'seconds', label: 'Turn on when countdown is under (seconds)', default: 10, min: 1, max: 3600 },
+				{
+					type: 'number',
+					id: 'seconds',
+					label: 'Turn on when countdown is under (seconds)',
+					default: 10,
+					min: 1,
+					max: 3600,
+				},
 			],
 			callback: (fb) => {
 				const t = liveTimeline(self, fb.options.timeline)
@@ -101,7 +108,9 @@ export default function (self) {
 				const frac = t && t.pct != null ? t.pct : 0
 				const w = (fb.image && fb.image.width) || 72,
 					h = (fb.image && fb.image.height) || 72
-				return { png64: barPngDataUrl(frac, { w, h, fg: fb.options.fg, bg: fb.options.bg, vertical: fb.options.vertical }) }
+				return {
+					png64: barPngDataUrl(frac, { w, h, fg: fb.options.fg, bg: fb.options.bg, vertical: fb.options.vertical }),
+				}
 			},
 		},
 
@@ -126,7 +135,9 @@ export default function (self) {
 				const frac = v && v.pct != null ? v.pct : 0
 				const w = (fb.image && fb.image.width) || 72,
 					h = (fb.image && fb.image.height) || 72
-				return { png64: barPngDataUrl(frac, { w, h, fg: fb.options.fg, bg: fb.options.bg, vertical: fb.options.vertical }) }
+				return {
+					png64: barPngDataUrl(frac, { w, h, fg: fb.options.fg, bg: fb.options.bg, vertical: fb.options.vertical }),
+				}
 			},
 		},
 	})

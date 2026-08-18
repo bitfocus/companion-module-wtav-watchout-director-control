@@ -2,7 +2,14 @@
 // self.apiPost(...). Dropdowns are filled from self.show (the discovered timelines
 // / cue sets / variables) and refresh whenever the show changes. allowCustom lets
 // you type an id before a show has been discovered.
-import { timelineChoices, variableChoices, cuesetPresetChoices, cueChoices, surfaceWidgetChoices, unpackPair } from './util.js'
+import {
+	timelineChoices,
+	variableChoices,
+	cuesetPresetChoices,
+	cueChoices,
+	surfaceWidgetChoices,
+	unpackPair,
+} from './util.js'
 
 export default function (self) {
 	const tls = timelineChoices(self.show)
@@ -46,11 +53,16 @@ export default function (self) {
 
 		timeline_play_at: {
 			name: 'Timeline: play from position (ms)',
-			options: [timelineField(), { type: 'number', id: 'time', label: 'Start position (ms)', default: 0, min: 0, max: 86400000 }],
+			options: [
+				timelineField(),
+				{ type: 'number', id: 'time', label: 'Start position (ms)', default: 0, min: 0, max: 86400000 },
+			],
 			callback: async (e) => {
 				const id = String(e.options.timeline)
 				const time = Number(e.options.time)
-				await self.apiPost('/timeline/' + encodeURIComponent(id) + '/play?time=' + (isFinite(time) ? Math.round(time) : 0))
+				await self.apiPost(
+					'/timeline/' + encodeURIComponent(id) + '/play?time=' + (isFinite(time) ? Math.round(time) : 0),
+				)
 			},
 		},
 
@@ -78,7 +90,15 @@ export default function (self) {
 				},
 				// Time mode: pick the timeline + the millisecond.
 				{ ...timelineField(), isVisible: (o) => o.mode === 'time' },
-				{ type: 'number', id: 'time', label: 'Time (ms)', default: 0, min: 0, max: 86400000, isVisible: (o) => o.mode === 'time' },
+				{
+					type: 'number',
+					id: 'time',
+					label: 'Time (ms)',
+					default: 0,
+					min: 0,
+					max: 86400000,
+					isVisible: (o) => o.mode === 'time',
+				},
 				{
 					type: 'dropdown',
 					id: 'state',
@@ -163,7 +183,15 @@ export default function (self) {
 					choices: vars.length ? vars : [{ id: '', label: '(no keyed variables discovered yet)' }],
 					allowCustom: true,
 				},
-				{ type: 'number', id: 'value', label: 'Value (in the variable’s own units)', default: 0, min: -1000000, max: 1000000, step: 0.01 },
+				{
+					type: 'number',
+					id: 'value',
+					label: 'Value (in the variable’s own units)',
+					default: 0,
+					min: -1000000,
+					max: 1000000,
+					step: 0.01,
+				},
 			],
 			callback: async (e) => {
 				const key = String(e.options.variable)

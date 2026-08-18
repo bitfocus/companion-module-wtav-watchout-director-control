@@ -38,15 +38,31 @@ export default function (self) {
 			name: tlName(t) + ': Play/Pause',
 			// name + a small live current time underneath
 			style: { text: tlName(t) + '\n' + v('tl_' + sid + '_time'), size: '14', color: WHITE, bgcolor: DARK },
-			steps: [{ down: [{ actionId: 'timeline_transport', options: { timeline: String(t.id), verb: 'toggle' } }], up: [] }],
+			steps: [
+				{ down: [{ actionId: 'timeline_transport', options: { timeline: String(t.id), verb: 'toggle' } }], up: [] },
+			],
 			feedbacks: [
-				{ feedbackId: 'timeline_state', options: { timeline: String(t.id), state: 'playing' }, style: { bgcolor: GREEN, color: WHITE } },
-				{ feedbackId: 'timeline_state', options: { timeline: String(t.id), state: 'paused' }, style: { bgcolor: AMBER, color: BLACK } },
+				{
+					feedbackId: 'timeline_state',
+					options: { timeline: String(t.id), state: 'playing' },
+					style: { bgcolor: GREEN, color: WHITE },
+				},
+				{
+					feedbackId: 'timeline_state',
+					options: { timeline: String(t.id), state: 'paused' },
+					style: { bgcolor: AMBER, color: BLACK },
+				},
 			],
 		}
 		toggleIds.push(pid)
 	}
-	if (toggleIds.length) section('tl_playpause', 'Timelines — Play / Pause', 'Toggle a timeline; green = playing, amber = paused.', toggleIds)
+	if (toggleIds.length)
+		section(
+			'tl_playpause',
+			'Timelines — Play / Pause',
+			'Toggle a timeline; green = playing, amber = paused.',
+			toggleIds,
+		)
 
 	// --- Timelines: stop -----------------------------------------------------
 	const stopIds = []
@@ -56,8 +72,16 @@ export default function (self) {
 			type: 'simple',
 			name: tlName(t) + ': Stop',
 			style: { text: 'STOP ' + tlName(t), size: '14', color: WHITE, bgcolor: combineRgb(60, 0, 0) },
-			steps: [{ down: [{ actionId: 'timeline_transport', options: { timeline: String(t.id), verb: 'stop' } }], up: [] }],
-			feedbacks: [{ feedbackId: 'timeline_state', options: { timeline: String(t.id), state: 'stopped' }, style: { bgcolor: RED, color: WHITE } }],
+			steps: [
+				{ down: [{ actionId: 'timeline_transport', options: { timeline: String(t.id), verb: 'stop' } }], up: [] },
+			],
+			feedbacks: [
+				{
+					feedbackId: 'timeline_state',
+					options: { timeline: String(t.id), state: 'stopped' },
+					style: { bgcolor: RED, color: WHITE },
+				},
+			],
 		}
 		stopIds.push(pid)
 	}
@@ -71,17 +95,28 @@ export default function (self) {
 			type: 'simple',
 			name: tlName(t) + ': Progress bar',
 			style: { text: tlName(t), size: '14', color: WHITE, bgcolor: BLACK, show_topbar: false },
-			steps: [{ down: [{ actionId: 'timeline_transport', options: { timeline: String(t.id), verb: 'toggle' } }], up: [] }],
-			feedbacks: [{ feedbackId: 'timeline_progress', options: { timeline: String(t.id), fg: GREEN, bg: DARK, vertical: false } }],
+			steps: [
+				{ down: [{ actionId: 'timeline_transport', options: { timeline: String(t.id), verb: 'toggle' } }], up: [] },
+			],
+			feedbacks: [
+				{ feedbackId: 'timeline_progress', options: { timeline: String(t.id), fg: GREEN, bg: DARK, vertical: false } },
+			],
 		}
 		progIds.push(pid)
 	}
-	if (progIds.length) section('tl_progress', 'Timelines — Progress bars', 'Live position bar; press toggles play/pause.', progIds)
+	if (progIds.length)
+		section('tl_progress', 'Timelines — Progress bars', 'Live position bar; press toggles play/pause.', progIds)
 
 	// --- Timelines: readouts — three separate sections so you pick the layout ---
 	// Every variant leads with the timeline NAME so a placed button always says which
 	// timeline it is. 'auto' text size keeps the multi-line ones readable.
-	const cdWarn = (t) => [{ feedbackId: 'countdown_warning', options: { timeline: String(t.id), seconds: 10 }, style: { bgcolor: RED, color: WHITE } }]
+	const cdWarn = (t) => [
+		{
+			feedbackId: 'countdown_warning',
+			options: { timeline: String(t.id), seconds: 10 },
+			style: { bgcolor: RED, color: WHITE },
+		},
+	]
 	const timeIds = [],
 		cdIds = [],
 		bothIds = []
@@ -92,7 +127,13 @@ export default function (self) {
 		presets[pTime] = {
 			type: 'simple',
 			name: nm + ': Current time',
-			style: { text: nm + '\n' + v('tl_' + sid + '_time'), size: '18', color: WHITE, bgcolor: BLACK, show_topbar: false },
+			style: {
+				text: nm + '\n' + v('tl_' + sid + '_time'),
+				size: '18',
+				color: WHITE,
+				bgcolor: BLACK,
+				show_topbar: false,
+			},
 			steps: [{ down: [], up: [] }],
 			feedbacks: [],
 		}
@@ -117,7 +158,14 @@ export default function (self) {
 			name: nm + ': Current time + countdown',
 			// name · current time · ▼ countdown · marker name
 			style: {
-				text: nm + '\n' + v('tl_' + sid + '_time') + '\n▼ ' + v('tl_' + sid + '_countdown') + '\n' + v('tl_' + sid + '_countdown_name'),
+				text:
+					nm +
+					'\n' +
+					v('tl_' + sid + '_time') +
+					'\n▼ ' +
+					v('tl_' + sid + '_countdown') +
+					'\n' +
+					v('tl_' + sid + '_countdown_name'),
 				size: 'auto',
 				color: WHITE,
 				bgcolor: BLACK,
@@ -131,8 +179,20 @@ export default function (self) {
 		bothIds.push(pBoth)
 	}
 	if (timeIds.length) section('tl_read_time', 'Timelines — Current time', 'Timeline name + live current time.', timeIds)
-	if (cdIds.length) section('tl_read_cd', 'Timelines — Countdown', 'Countdown to the next marker (with its name); red under 10 s, --:-- when no marker is ahead.', cdIds)
-	if (bothIds.length) section('tl_read_both', 'Timelines — Current time + Countdown', 'Current time and countdown on one button.', bothIds)
+	if (cdIds.length)
+		section(
+			'tl_read_cd',
+			'Timelines — Countdown',
+			'Countdown to the next marker (with its name); red under 10 s, --:-- when no marker is ahead.',
+			cdIds,
+		)
+	if (bothIds.length)
+		section(
+			'tl_read_both',
+			'Timelines — Current time + Countdown',
+			'Current time and countdown on one button.',
+			bothIds,
+		)
 
 	// --- Cue sets: activate preset (active highlight) ------------------------
 	const cueIds = []
@@ -144,7 +204,13 @@ export default function (self) {
 				name: (g.name || g.id) + ': ' + (p.name || p.id),
 				style: { text: p.name || p.id, size: '14', color: WHITE, bgcolor: DARK },
 				steps: [{ down: [{ actionId: 'cueset_preset', options: { preset: packPair(g.id, p.id) } }], up: [] }],
-				feedbacks: [{ feedbackId: 'cueset_active', options: { preset: packPair(g.id, p.id) }, style: { bgcolor: CORAL, color: BLACK } }],
+				feedbacks: [
+					{
+						feedbackId: 'cueset_active',
+						options: { preset: packPair(g.id, p.id) },
+						style: { bgcolor: CORAL, color: BLACK },
+					},
+				],
 			}
 			cueIds.push(pid)
 		}
@@ -180,7 +246,13 @@ export default function (self) {
 			varIds.push(pid)
 		}
 	}
-	if (varIds.length) section('variables', 'Variables', 'Live value bar, and set-to-min/max examples (duplicate and edit the value).', varIds)
+	if (varIds.length)
+		section(
+			'variables',
+			'Variables',
+			'Live value bar, and set-to-min/max examples (duplicate and edit the value).',
+			varIds,
+		)
 
 	// --- Surface: press a widget, grouped per page ---------------------------
 	const pressIds = []
@@ -197,7 +269,8 @@ export default function (self) {
 			pressIds.push(pid)
 		}
 	}
-	if (pressIds.length) section('surface', 'Surface buttons', 'Press a button/widget on the app’s own canvas, per page.', pressIds)
+	if (pressIds.length)
+		section('surface', 'Surface buttons', 'Press a button/widget on the app’s own canvas, per page.', pressIds)
 
 	// --- Status --------------------------------------------------------------
 	presets['status'] = {

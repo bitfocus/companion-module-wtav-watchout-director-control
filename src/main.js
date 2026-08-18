@@ -15,7 +15,9 @@ export const UpgradeScripts = upgradeScripts
 function showSignature(s) {
 	if (!s) return ''
 	return JSON.stringify([
-		(s.timelines || []).map((t) => t.id + ':' + t.name + ':' + t.folder + ':' + (t.cues || []).map((c) => c.id).join('.')),
+		(s.timelines || []).map(
+			(t) => t.id + ':' + t.name + ':' + t.folder + ':' + (t.cues || []).map((c) => c.id).join('.'),
+		),
 		(s.cueSets || []).map((g) => g.id + ':' + (g.presets || []).map((p) => p.id + '=' + p.name).join(',')),
 		(s.variables || []).map((v) => v.key + ':' + v.name),
 		((s.surface && s.surface.pages) || []).map((p) => p.name + ':' + (p.widgets || []).map((w) => w.id).join('.')),
