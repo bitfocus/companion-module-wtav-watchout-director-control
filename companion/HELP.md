@@ -1,4 +1,4 @@
-# WTAV Director Control
+# Watchout Director Control (WTAV)
 
 Control a running **WTAV Director Control** app (a control surface for Dataton **WATCHOUT 7**) from
 Companion. This module talks to the app's semantic **`/api/v1`** surface — timelines, cue sets and

@@ -1,14 +1,14 @@
 {
 	"$schema": "../node_modules/@companion-module/base/assets/manifest.schema.json",
 	"type": "connection",
-	"id": "wtav-directorcontrol",
-	"name": "wtav-directorcontrol",
+	"id": "wtav-watchout-director-control",
+	"name": "wtav-watchout-director-control",
 	"shortname": "WATCHOUT Director",
-	"description": "WTAV Watchout Director Control — drive a WTAV Director Control app (Dataton WATCHOUT 7 surface): timelines, cue sets and variables, with live feedback and 0-100% bars.",
+	"description": "Control a WTAV Director Control app (Dataton WATCHOUT 7 surface): timelines, cue sets and variables, with live feedback and 0-100% bars.",
 	"version": "0.1.0",
 	"license": "MIT",
-	"repository": "git+https://github.com/wvanmaris/companion-module-watchoutdirectorcontrol.git",
-	"bugs": "https://github.com/wvanmaris/companion-module-watchoutdirectorcontrol/issues",
+	"repository": "git+https://github.com/bitfocus/companion-module-wtav-watchout-director-control.git",
+	"bugs": "https://github.com/bitfocus/companion-module-wtav-watchout-director-control/issues",
 	"maintainers": [
 		{
 			"name": "WTAV",
@@ -21,7 +21,7 @@
 		"apiVersion": "0.0.0",
 		"entrypoint": "../src/main.js"
 	},
-	"legacyIds": [],
+	"legacyIds": ["wtav-directorcontrol"],
 	"manufacturer": "WTAV",
 	"products": ["Watchout Director Control"],
 	"keywords": ["WATCHOUT", "Dataton", "WTAV", "playback", "timeline"]

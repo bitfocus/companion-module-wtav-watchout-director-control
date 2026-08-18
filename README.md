@@ -1,4 +1,4 @@
-# companion-module-watchoutdirectorcontrol
+# companion-module-wtav-watchout-director-control
 
 A [Bitfocus Companion](https://bitfocus.io/companion) module for the **WTAV Director Control** app —
 a control surface for Dataton **WATCHOUT 7**. It drives the app's semantic **`/api/v1`** surface

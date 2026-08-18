@@ -1,5 +1,5 @@
 {
-	"name": "companion-module-watchoutdirectorcontrol",
+	"name": "companion-module-wtav-watchout-director-control",
 	"version": "0.1.0",
 	"type": "module",
 	"main": "src/main.js",
@@ -11,7 +11,7 @@
 	"license": "MIT",
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/wvanmaris/companion-module-watchoutdirectorcontrol.git"
+		"url": "git+https://github.com/bitfocus/companion-module-wtav-watchout-director-control.git"
 	},
 	"engines": {
 		"node": "^22.20"
