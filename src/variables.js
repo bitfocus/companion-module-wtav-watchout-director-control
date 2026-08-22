@@ -1,6 +1,6 @@
 // Companion variable DEFINITIONS (base 2.x: an OBJECT keyed by variableId),
 // rebuilt when the show changes. The matching VALUES are computed by computeValues()
-// from the live /state and pushed by main.js each poll. One id scheme, shared, so
+// from the live /state and pushed by pushValues() each poll. One id scheme, shared, so
 // the two never drift.
 import { sanitizeId, fmtTime, fmtNum } from './util.js'
 
@@ -52,6 +52,10 @@ export default function (self) {
 		defs[id.source] = { name: nm + ' — value source' }
 	}
 	self.setVariableDefinitions(defs)
+	// Redefining the variables can drop the values Companion holds for them, so the diff in
+	// pushValues() must start from scratch: the next poll re-sends every value, not just the
+	// ones that happen to have changed since the last one.
+	self._varCache = {}
 }
 
 export function computeValues(self) {
@@ -88,4 +92,23 @@ export function computeValues(self) {
 		out[id.source] = lv.source || '—'
 	}
 	return out
+}
+
+// Push only the values that actually CHANGED. setVariableValues() takes a partial set —
+// anything left out keeps the value Companion already has — so this is invisible to the
+// user: a running timeline still updates every poll, an idle show simply goes quiet. Note
+// this says nothing about feedbacks; main.js still checks those on every poll.
+export function pushValues(self) {
+	const values = computeValues(self)
+	const cache = self._varCache || (self._varCache = {})
+	const changed = {}
+	let count = 0
+	for (const id in values) {
+		if (cache[id] === values[id]) continue
+		cache[id] = values[id]
+		changed[id] = values[id]
+		count++
+	}
+	if (count) self.setVariableValues(changed)
+	return count
 }

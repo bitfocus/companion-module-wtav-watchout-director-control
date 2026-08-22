@@ -1,10 +1,10 @@
 // Isolated tests for the module's dependency-free core — no @companion-module/base
 // needed. Covers the show->choices helpers + id scheme, the time/fraction maths,
-// the API url builder, and the PNG bar renderer (valid PNG, fill actually varies).
-// Run: node scratchpad/test-module.js   (also `npm test`)
+// the API url builder, and the variable-value diff that keeps unchanged values off
+// the wire. Run: node scratchpad/test-module.js   (also `npm test`)
 import * as util from '../src/util.js'
 import { apiUrl } from '../src/api.js'
-import { barPng, barPngDataUrl, encodePng } from '../src/bar.js'
+import setupVariables, { pushValues } from '../src/variables.js'
 
 let pass = 0,
 	fail = 0
@@ -99,22 +99,33 @@ eq(
 	'apiUrl numeric port',
 )
 
-// --- bar png ---------------------------------------------------------------
-console.log('bar png')
-const SIG = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a])
-const b64 = barPng(0.5, { w: 72, h: 72 })
-const buf = Buffer.from(b64, 'base64')
-ok(buf.slice(0, 8).equals(SIG), 'bar output is a valid PNG (signature)')
-ok(buf.length > 100, 'bar PNG has real content')
-ok(barPngDataUrl(0.5, { w: 20, h: 20 }).startsWith('data:image/png;base64,'), 'data URL wrapper')
-const empty = barPng(0, { w: 40, h: 20 }),
-	half = barPng(0.5, { w: 40, h: 20 }),
-	full = barPng(1, { w: 40, h: 20 })
-ok(empty !== half && half !== full && empty !== full, 'fill fraction changes the image')
-ok(barPng(NaN, { w: 20, h: 20 }) === barPng(0, { w: 20, h: 20 }), 'NaN fraction renders as empty')
-ok(barPng(2, { w: 40, h: 20 }) === full, 'over-1 fraction clamps to full')
-const png = encodePng(10, 4, Buffer.alloc(10 * 4 * 4, 0xff))
-ok(png.readUInt32BE(16) === 10 && png.readUInt32BE(20) === 4, 'encodePng writes width/height in IHDR')
+// --- variable values: only push what changed ------------------------------
+console.log('variable value diff')
+const fake = {
+	show: { timelines: [{ id: '0', name: 'Main' }], variables: [], showName: 'Demo' },
+	live: {
+		timelines: [{ id: '0', state: 'playing', timeMs: 1000, pct: 0.5 }],
+		variables: [],
+		cueSets: [],
+		_connected: true,
+	},
+	_varCache: {},
+	pushed: [],
+	setVariableValues(values) {
+		this.pushed.push(values)
+	},
+	setVariableDefinitions() {},
+}
+ok(pushValues(fake) > 0, 'first push sends the whole set')
+ok(fake.pushed.length === 1 && fake.pushed[0].tl_0_state === 'playing', 'values reach setVariableValues')
+eq(pushValues(fake), 0, 'an unchanged state pushes nothing')
+ok(fake.pushed.length === 1, 'and does not call setVariableValues at all')
+fake.live.timelines[0].timeMs = 2000
+eq(pushValues(fake), 2, 'a moved playhead pushes only the two time values')
+eq(Object.keys(fake.pushed[1]).sort(), ['tl_0_time', 'tl_0_time_ms'], 'exactly the changed ids')
+setupVariables(fake)
+eq(Object.keys(fake._varCache).length, 0, 'rebuilding the definitions clears the diff cache')
+ok(pushValues(fake) > 2, 'so the next push re-sends everything')
 
 console.log('\n' + pass + ' passed, ' + fail + ' failed')
 process.exitCode = fail ? 1 : 0

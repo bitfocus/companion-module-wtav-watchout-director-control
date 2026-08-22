@@ -1,7 +1,9 @@
 // Preset definitions — ready-made buttons generated from the discovered show,
 // grouped into sections by kind, with the matching feedback already attached.
 // base 2.x: setPresetDefinitions(structure, presets) — structure is the sections,
-// presets is a map keyed by id. Preset type is 'simple'.
+// presets is a map keyed by id. Most presets are type 'simple'; the two 0-100% bars are
+// type 'layered' (API 2.1 / Companion 5): a `gauge` element fed by one of our own *_pct
+// variables, so Companion draws the bar instead of the module shipping a PNG.
 import { combineRgb } from '@companion-module/base'
 import { sanitizeId, packPair } from './util.js'
 
@@ -23,6 +25,39 @@ export default function (self) {
 	const tlName = (t) => t.name || 'Timeline ' + t.id
 	const lbl = self.label || 'internal' // for referencing our own variables in button text
 	const v = (id) => '$(' + lbl + ':' + id + ')'
+	const variableRef = v // v is shadowed by the loop variable in the variables section below
+
+	// A live 0-100% bar, drawn by Companion from one of our *_pct variables. Element
+	// x/y/width/height are PERCENTAGES of the button, not pixels; the value has to be an
+	// expression because a gauge wants a number, not a variable-substituted string.
+	const gaugeElement = (variableId, colour) => ({
+		type: 'gauge',
+		id: 'bar',
+		x: 0,
+		y: 0,
+		width: 100,
+		height: 100,
+		orientation: 'horizontal',
+		min: 0,
+		max: 100,
+		value: { isExpression: true, value: variableRef(variableId) },
+		stops: [{ value: 0, color: colour, gradient: false }],
+		trackStyle: 'dimmed',
+	})
+	const captionElement = (text) => ({
+		type: 'text',
+		id: 'label',
+		x: 0,
+		y: 0,
+		width: 100,
+		height: 100,
+		text,
+		fontsize: 14,
+		fontsizeAllowShrink: true,
+		color: WHITE,
+		halign: 'center',
+		valign: 'center',
+	})
 
 	const presets = {}
 	const sections = []
@@ -92,15 +127,14 @@ export default function (self) {
 	for (const t of timelines) {
 		const pid = 'tl_' + sanitizeId(t.id) + '_progress'
 		presets[pid] = {
-			type: 'simple',
+			type: 'layered',
 			name: tlName(t) + ': Progress bar',
-			style: { text: tlName(t), size: '14', color: WHITE, bgcolor: BLACK, show_topbar: false },
+			canvas: { decoration: 'none' },
+			elements: [gaugeElement('tl_' + sanitizeId(t.id) + '_pct', GREEN), captionElement(tlName(t))],
 			steps: [
 				{ down: [{ actionId: 'timeline_transport', options: { timeline: String(t.id), verb: 'toggle' } }], up: [] },
 			],
-			feedbacks: [
-				{ feedbackId: 'timeline_progress', options: { timeline: String(t.id), fg: GREEN, bg: DARK, vertical: false } },
-			],
+			feedbacks: [],
 		}
 		progIds.push(pid)
 	}
@@ -223,11 +257,12 @@ export default function (self) {
 		const skey = sanitizeId(v.key)
 		const bar = 'var_' + skey + '_bar'
 		presets[bar] = {
-			type: 'simple',
+			type: 'layered',
 			name: (v.name || v.key) + ': value bar',
-			style: { text: v.name || v.key, size: '14', color: WHITE, bgcolor: BLACK, show_topbar: false },
+			canvas: { decoration: 'none' },
+			elements: [gaugeElement('var_' + skey + '_pct', BLUE), captionElement(v.name || v.key)],
 			steps: [{ down: [], up: [] }],
-			feedbacks: [{ feedbackId: 'variable_bar', options: { variable: v.key, fg: BLUE, bg: DARK, vertical: false } }],
+			feedbacks: [],
 		}
 		varIds.push(bar)
 		for (const [suffix, label, value] of [

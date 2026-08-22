@@ -2,7 +2,7 @@ import { InstanceBase, InstanceStatus, Regex } from '@companion-module/base'
 import upgradeScripts from './upgrades.js'
 import setupActions from './actions.js'
 import setupFeedbacks from './feedbacks.js'
-import setupVariables, { computeValues } from './variables.js'
+import setupVariables, { pushValues } from './variables.js'
 import setupPresets from './presets.js'
 import { apiUrl, getJson, postJson } from './api.js'
 
@@ -30,6 +30,7 @@ export default class DirectorControlInstance extends InstanceBase {
 		this.show = { timelines: [], cueSets: [], variables: [], surface: { pages: [] }, showName: '' }
 		this.live = { timelines: [], variables: [], cueSets: [], _connected: false }
 		this._showSig = ''
+		this._varCache = {} // last pushed variable values; see pushValues()
 	}
 
 	async init(config) {
@@ -46,6 +47,7 @@ export default class DirectorControlInstance extends InstanceBase {
 	async configUpdated(config) {
 		this.config = config
 		this._showSig = '' // force a rebuild against the new target
+		this._varCache = {} // a different target means every value is news again
 		this.stopPolling()
 		this.startPolling()
 	}
@@ -129,7 +131,7 @@ export default class DirectorControlInstance extends InstanceBase {
 		if (!st) {
 			if (this.live._connected !== false) this.updateStatus(InstanceStatus.ConnectionFailure, 'no /api/v1 response')
 			this.live = { ...this.live, _connected: false }
-			this.setVariableValues(computeValues(this))
+			pushValues(this)
 			return
 		}
 		this.updateStatus(InstanceStatus.Ok)
@@ -140,7 +142,7 @@ export default class DirectorControlInstance extends InstanceBase {
 			_connected: true,
 		}
 		if (!this.show.showName && st.showName) this.show.showName = st.showName
-		this.setVariableValues(computeValues(this))
-		this.checkFeedbacks('timeline_state', 'countdown_warning', 'cueset_active', 'timeline_progress', 'variable_bar')
+		pushValues(this)
+		this.checkFeedbacks('timeline_state', 'countdown_warning', 'cueset_active')
 	}
 }

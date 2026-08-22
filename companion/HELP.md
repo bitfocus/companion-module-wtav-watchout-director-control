@@ -7,6 +7,19 @@ variables by name/id, independent of how the app's canvas is laid out.
 The **WTAV Director Control** application itself (Windows + macOS) is available at
 <https://www.avtrade.nl/wtav-director-control.html>.
 
+## Requires Companion 5.0 or newer
+
+From v1.1.0 this module is built against the Companion 5 module API. The live 0-100% bars are
+drawn by Companion itself, from a **gauge** graphics element bound to the module's own `*_pct`
+variables — gauges do not exist in Companion 4, so the module cannot run there.
+
+Still on **Companion 4.x** and unable to upgrade? Mail **control-support@avtrade.nl** and we will
+send you a legacy build (v1.0.0, bars drawn as images by the module) that you install with
+**Settings → Modules → Import module package**. That is WTAV support — not Bitfocus, who neither
+host nor support that package. It does not automatically follow every release — we port over what
+is worth porting — so upgrading to Companion 5 stays the real fix. Companion 3.x and older are not
+supported at all.
+
 ## Setup
 
 1. In the **WTAV Director Control** app: open **Settings** and **start the web control surface**
@@ -38,14 +51,21 @@ Play/Pause** (green when playing, amber when paused), **— Stop** (red when sto
 bar plus set-to-min/max examples), **Surface buttons** (one per pressable widget, per page), and
 **Status**. Drag one onto a button and it arrives fully wired with its feedback.
 
+The two bar presets are **layered** buttons: a gauge element reading `..._pct`, with the name on
+top. Everything about them is yours to edit once the button is placed — colour, horizontal /
+vertical / ring, the label — and you can add a gauge to any button of your own the same way,
+pointing it at any of this module's percentage variables.
+
 ## Feedbacks
 
 - **Timeline: play state (colour)** — restyle a button when a timeline is playing / paused / stopped.
 - **Timeline: countdown warning (colour)** — turn a button red when the countdown to the next marker
   drops under a chosen number of seconds (default 10).
 - **Cue set: preset is active (colour)** — light up the active preset.
-- **Timeline: progress bar (0-100%)** — a live fill bar of the timeline's position.
-- **Variable: value bar (0-100%)** — a live fill bar of a variable's value across its range.
+
+All three are boolean feedbacks: they switch on and off, and you choose the style they apply. The
+0-100% bars are not feedbacks — they are gauge elements on the button, fed by the `*_pct` variables
+below (see **Presets**).
 
 ## Variables
 

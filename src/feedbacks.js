@@ -1,20 +1,16 @@
-// Feedback definitions. Boolean feedbacks restyle a button (colour); "advanced"
-// feedbacks draw a live 0-100% fill bar as a png64 image (a data URL, matching how
-// Bitfocus' own modules return png64). All read from self.live (the /api/v1/state
-// snapshot refreshed by the poll loop).
-import { timelineChoices, variableChoices, cuesetPresetChoices, unpackPair } from './util.js'
-import { barPngDataUrl } from './bar.js'
+// Feedback definitions. All of these are BOOLEAN feedbacks: the callback returns true or
+// false and the user picks the style it applies. Live 0-100% bars are NOT drawn here — a
+// Companion 5 gauge element bound to our *_pct variables does that (see presets.js), which
+// is why this module has no `advanced` feedbacks. All read from self.live (the
+// /api/v1/state snapshot refreshed by the poll loop).
+import { timelineChoices, cuesetPresetChoices, unpackPair } from './util.js'
 
 function liveTimeline(self, id) {
 	return (self.live.timelines || []).find((t) => String(t.id) === String(id)) || null
 }
-function liveVariable(self, key) {
-	return (self.live.variables || []).find((v) => String(v.key) === String(key)) || null
-}
 
 export default function (self) {
 	const tls = timelineChoices(self.show)
-	const vars = variableChoices(self.show)
 	const presets = cuesetPresetChoices(self.show)
 	const tlField = {
 		type: 'dropdown',
@@ -91,53 +87,6 @@ export default function (self) {
 				if (!pair) return false
 				const g = (self.live.cueSets || []).find((x) => String(x.id) === String(pair.groupId))
 				return !!g && String(g.activePresetId) === String(pair.presetId)
-			},
-		},
-
-		timeline_progress: {
-			name: 'Timeline: progress bar (0-100%)',
-			type: 'advanced',
-			options: [
-				tlField,
-				{ type: 'colorpicker', id: 'fg', label: 'Bar colour', default: 0x33cc66 },
-				{ type: 'colorpicker', id: 'bg', label: 'Background', default: 0x222222 },
-				{ type: 'checkbox', id: 'vertical', label: 'Vertical', default: false },
-			],
-			callback: (fb) => {
-				const t = liveTimeline(self, fb.options.timeline)
-				const frac = t && t.pct != null ? t.pct : 0
-				const w = (fb.image && fb.image.width) || 72,
-					h = (fb.image && fb.image.height) || 72
-				return {
-					png64: barPngDataUrl(frac, { w, h, fg: fb.options.fg, bg: fb.options.bg, vertical: fb.options.vertical }),
-				}
-			},
-		},
-
-		variable_bar: {
-			name: 'Variable: value bar (0-100%)',
-			type: 'advanced',
-			options: [
-				{
-					type: 'dropdown',
-					id: 'variable',
-					label: 'Variable (by key)',
-					default: (vars[0] && vars[0].id) || '',
-					choices: vars.length ? vars : [{ id: '', label: '(no keyed variables yet)' }],
-					allowCustom: true,
-				},
-				{ type: 'colorpicker', id: 'fg', label: 'Bar colour', default: 0x4aa3ff },
-				{ type: 'colorpicker', id: 'bg', label: 'Background', default: 0x222222 },
-				{ type: 'checkbox', id: 'vertical', label: 'Vertical', default: false },
-			],
-			callback: (fb) => {
-				const v = liveVariable(self, fb.options.variable)
-				const frac = v && v.pct != null ? v.pct : 0
-				const w = (fb.image && fb.image.width) || 72,
-					h = (fb.image && fb.image.height) || 72
-				return {
-					png64: barPngDataUrl(frac, { w, h, fg: fb.options.fg, bg: fb.options.bg, vertical: fb.options.vertical }),
-				}
 			},
 		},
 	})
